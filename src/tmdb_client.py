@@ -1,20 +1,40 @@
-import os 
 import requests as rq
-from dotenv import load_dotenv
 
-load_dotenv()
+class TMDBClient:
+    def __init__(self, token, base_url):
+        self.token = token 
+        self.BASE_URL = base_url
+        self.headers = {
+            "Authorization": f"Bearer {self.token}"
+        }
+        self.session = rq.Session()
 
-TMDB_TOKEN = os.getenv("TMDB_READ_ACCESS_TOKEN")
-TMDB_KEY = os.getenv("TMDB_API_KEY")
 
-BASE_URL = "https://api.themoviedb.org/3/movie"
-movieId = 550
-url = f"{BASE_URL}/{movieId}"
-headers = {
-    "Authorization": f"Bearer {TMDB_TOKEN}"
-}
+    def get_movie_details(self, tmdb_id):
+        url = f"{self.BASE_URL}/movie/{tmdb_id}"
 
-respond = rq.get(url, headers=headers)
+        respond = self.session.get(url, headers=self.headers)
+        respond.raise_for_status()
+        details = (respond.json())
+        
+        movie_data = [
+                details['id'],
+                details['title'],
+                details['release_date'],
+                details['runtime'],
+                details['budget'],
+                details['revenue'],
+                details['vote_average'],
+                details['vote_count']
+        ]
 
-print(respond.status_code)
-print(respond.json())
+        genres = details['genres']
+
+        return movie_data, genres
+
+
+#     def get_movie_credits(self, tmdb_id):
+#         url = f"{self.BASE_URL}/movie/{tmdb_id}/credits"
+#         respond = self.session.get(url, headers=self.headers)
+#         respond.raise_for_status()
+#         return respond.json()
