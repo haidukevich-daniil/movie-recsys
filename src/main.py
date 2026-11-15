@@ -51,6 +51,10 @@ def loading(client, links):
 
 
 def main():
+
+    # links = pd.read_csv('data/raw/ml-latest-small/links.csv')
+    # loading(client, links)
+
     create_tables()
     client = TMDBClient(TMDB_TOKEN, BASE_URL)
 
@@ -67,8 +71,7 @@ def main():
 
 
 
-    links = pd.read_csv('data/raw/ml-latest-small/links.csv')
-    loading(client, links)
+
 
 
 if __name__ == "__main__":
