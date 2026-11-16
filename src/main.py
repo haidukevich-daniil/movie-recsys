@@ -1,6 +1,7 @@
 import os 
 import pandas as pd
 import time
+import sqlite3
 from dotenv import load_dotenv
 
 from src.tmdb_client import TMDBClient
@@ -49,14 +50,29 @@ def loading(client, links):
     print("Collection finished!")
     print(f"Failed movies: {len(failed_ids)}")
 
+def load_failed_movies(client, links):
+    connection = sqlite3.connect("data/movies.db")
+    movies = pd.read_sql_query("SELECT tmdb_id FROM movies", connection)
+    connection.close()
+
+
+    missing_movies = links[
+        links["tmdbId"].notna() &
+        ~links["tmdbId"].isin(movies["tmdb_id"])
+    ]
+
+    loading(client, missing_movies)
+    
 
 def main():
+    create_tables()
+    client = TMDBClient(TMDB_TOKEN, BASE_URL)
 
     # links = pd.read_csv('data/raw/ml-latest-small/links.csv')
     # loading(client, links)
+    # load_failed_movies(client, links)
 
-    create_tables()
-    client = TMDBClient(TMDB_TOKEN, BASE_URL)
+
 
     #tmdb_id = 862
     # check_movie(tmdb_id, client)
